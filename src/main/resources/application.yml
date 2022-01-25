@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  url: http://localhost:8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/converter?currentSchema=converter
+    username: postgres
+    password: root
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+
