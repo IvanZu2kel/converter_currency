@@ -35,9 +35,8 @@ public class InitCurrencyService {
     ApplicationRunner init(CurrencyRateRepository currencyRateRepository, CurrencyRepository currencyRepository) {
         DataFromXml dataFromXml = parseRates();
         DataFromXml data = Optional.of(Objects.requireNonNull(dataFromXml)).orElseThrow();
-        return args -> {
+        return init -> {
             currencyRepository.deleteAll();
-            currencyRateRepository.deleteAll();
             currencyRepository.save(new Currency("1", "111", "RUB", 1, "Российский рубль"));
             currencyRepository.saveAll(data.getCurrencies());
             currencyRateRepository.save(new CurrencyRate("1", null, "RUB", 1.0));

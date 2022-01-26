@@ -28,5 +28,5 @@ public class CurrencyRate {
     @Column
     private String charCode;
     @Column
-    private double rate;
+    private Double rate;
 }
