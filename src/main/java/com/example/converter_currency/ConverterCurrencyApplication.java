@@ -13,9 +13,4 @@ public class ConverterCurrencyApplication {
     public static void main(String[] args) {
         SpringApplication.run(ConverterCurrencyApplication.class, args);
     }
-
-    @Bean
-    ApplicationRunner init(CurrencyRateRepository currencyRateRepository, CurrencyRepository currencyRepository) {
-        return null;
-    }
 }
