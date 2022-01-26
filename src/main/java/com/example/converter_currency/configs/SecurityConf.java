@@ -17,16 +17,13 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http
-                .formLogin().defaultSuccessUrl("/convert", true)
+                .httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/**/*.js", "/**/*.css").permitAll()
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()
+                .formLogin().permitAll()
                 .and()
                 .logout()
                 .permitAll();

@@ -22,9 +22,9 @@ public class Conversion {
     @Column
     private String secondCurrency;
     @Column
-    private double firstValue;
+    private Double firstValue;
     @Column
-    private double secondValue;
+    private Double secondValue;
     @Column
     private LocalDate date;
 }

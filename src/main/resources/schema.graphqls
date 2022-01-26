@@ -1,0 +1,17 @@
+scalar Date
+
+schema {
+  query: EntryPoints
+}
+
+type EntryPoints {
+  conversion(id: Long!): Conversion
+}
+
+type Conversion {
+  id: Long!
+  firstCurrency: String!
+  secondCurrency: String!
+  firstValue: Float!
+  secondValue: Float!
+}
