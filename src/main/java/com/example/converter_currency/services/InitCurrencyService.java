@@ -1,6 +1,7 @@
 package com.example.converter_currency.services;
 
 import com.example.converter_currency.api.request.DataFromXml;
+import com.example.converter_currency.models.Currency;
 import com.example.converter_currency.models.CurrencyRate;
 import com.example.converter_currency.repositories.CurrencyRateRepository;
 import com.example.converter_currency.repositories.CurrencyRepository;
@@ -16,11 +17,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class InitCurrencyService {
@@ -28,8 +33,16 @@ public class InitCurrencyService {
 
     @Bean
     ApplicationRunner init(CurrencyRateRepository currencyRateRepository, CurrencyRepository currencyRepository) {
-        DataFromXml data = parseRates();
-        return null;
+        DataFromXml dataFromXml = parseRates();
+        DataFromXml data = Optional.of(Objects.requireNonNull(dataFromXml)).orElseThrow();
+        return args -> {
+            currencyRepository.deleteAll();
+            currencyRateRepository.deleteAll();
+            currencyRepository.save(new Currency("1", "111", "RUB", 1, "Российский рубль"));
+            currencyRepository.saveAll(data.getCurrencies());
+            currencyRateRepository.save(new CurrencyRate("1", null, "RUB", 1.0));
+            currencyRateRepository.saveAll(data.getCurrencyRates());
+        };
     }
 
     private DataFromXml parseRates() {
@@ -39,20 +52,68 @@ public class InitCurrencyService {
                     .newDocumentBuilder()
                     .parse(CBR_URL);
             doc.getDocumentElement().normalize();
-            NodeList nodeList = doc.getElementsByTagName("ValCurs");
-            Node node = nodeList.item(0);
+            NodeList allNodes = doc.getElementsByTagName("ValCurs");
+            Node node = allNodes.item(0);
             LocalDate date = getLocalDate(node);
             List<Currency> currencies = new ArrayList<>();
             List<CurrencyRate> currencyRates = new ArrayList<>();
+            NodeList nodeList = doc.getElementsByTagName("Valute");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node n = nodeList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) n;
+                    Currency currency = getCurrencyByElement(element);
+                    currencies.add(currency);
+                    CurrencyRate currencyRate = getCurrencyRateByElement(element, date);
+                    currencyRates.add(currencyRate);
+                }
+            }
+            return new DataFromXml()
+                    .setCurrencies(currencies)
+                    .setCurrencyRates(currencyRates);
 
-
-
-
-
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | ParseException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private CurrencyRate getCurrencyRateByElement(Element element, LocalDate date) throws ParseException {
+        DecimalFormat df = new DecimalFormat();
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator(' ');
+        df.setDecimalFormatSymbols(symbols);
+
+        return new CurrencyRate()
+                .setId(element.getAttribute("ID"))
+                .setDate(date)
+                .setCharCode(element
+                        .getElementsByTagName("CharCode")
+                        .item(0)
+                        .getTextContent())
+                .setRate((Double) df.parse((element.getElementsByTagName("Value").item(0).getTextContent())));
+    }
+
+    private Currency getCurrencyByElement(Element element) {
+        return new Currency()
+                .setId(element.getAttribute("ID"))
+                .setName(element
+                        .getElementsByTagName("Name")
+                        .item(0)
+                        .getTextContent())
+                .setNumCode(element
+                        .getElementsByTagName("NumCode")
+                        .item(0)
+                        .getTextContent())
+                .setCharCode(element
+                        .getElementsByTagName("CharCode")
+                        .item(0)
+                        .getTextContent())
+                .setNominal(Integer.parseInt(element
+                        .getElementsByTagName("Nominal")
+                        .item(0)
+                        .getTextContent()));
     }
 
     private LocalDate getLocalDate(Node node) {

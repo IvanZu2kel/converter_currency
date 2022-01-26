@@ -1,6 +1,8 @@
 package com.example.converter_currency.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,6 +14,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "currencies")
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Currency {
     @Id
     @GeneratedValue(generator = "uuid")

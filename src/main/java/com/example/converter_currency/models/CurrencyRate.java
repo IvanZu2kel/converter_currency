@@ -1,6 +1,8 @@
 package com.example.converter_currency.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,6 +15,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "currency_rates")
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class CurrencyRate {
     @Id
     @GeneratedValue(generator = "uuid")
