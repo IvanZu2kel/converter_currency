@@ -1,0 +1,1 @@
+web: java -jar target/converter_currency-1.0.jar
