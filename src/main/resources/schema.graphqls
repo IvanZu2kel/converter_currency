@@ -3,17 +3,24 @@ scalar Date
 type Query {
 conversion: [Conversion]
 currency: [Currency]
-statistics: [Conversion]
+statistics: [ConversionWithStatistics]
 }
 
 type Conversion {
 id: ID!
 firstCurrency: String,
 secondCurrency: String,
-firstValue: Short,
-secondValue: Short,
+firstValue: Int,
+secondValue: Int,
 firstRate: Float,
 secondRate: Float
+}
+
+type ConversionWithStatistics {
+firstCurrency: String,
+secondCurrency: String,
+avgRage: Float,
+volume: Int
 }
 
 type Currency {
@@ -31,5 +38,5 @@ rate: Float
 }
 
 type Mutation {
-calculateValue(firstCurrency: String!, secondCurrency: String!, amount: Short!): Short!
+calculateValue(firstCurrency: String!, secondCurrency: String!, amount: Int!): Int!
 }

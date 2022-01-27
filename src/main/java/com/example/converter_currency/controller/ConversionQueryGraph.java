@@ -1,6 +1,7 @@
 package com.example.converter_currency.controller;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
+import com.example.converter_currency.api.response.ConversionWithStatistics;
 import com.example.converter_currency.models.Conversion;
 import com.example.converter_currency.models.Currency;
 import com.example.converter_currency.services.CalculateService;
@@ -8,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class ConversionQueryGraph implements GraphQLQueryResolver {
     private final CalculateService calculateService;
-//    private final RestTemplate http;
 
     public List<Conversion> conversion() {
         return this.calculateService.getConversions();
@@ -23,7 +24,7 @@ public class ConversionQueryGraph implements GraphQLQueryResolver {
         return this.calculateService.getAllCurrencies();
     }
 
-    public List<Conversion> statistics() {
+    public Set<ConversionWithStatistics> statistics() {
         return this.calculateService.getStatistics();
     }
 }

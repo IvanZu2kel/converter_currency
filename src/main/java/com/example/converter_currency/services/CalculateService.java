@@ -1,18 +1,21 @@
 package com.example.converter_currency.services;
 
+import com.example.converter_currency.api.response.ConversionWithStatistics;
 import com.example.converter_currency.models.Conversion;
 import com.example.converter_currency.models.Currency;
 import com.example.converter_currency.models.CurrencyRate;
 import com.example.converter_currency.repositories.ConversionRepository;
 import com.example.converter_currency.repositories.CurrencyRateRepository;
 import com.example.converter_currency.repositories.CurrencyRepository;
+import com.google.common.util.concurrent.AtomicDouble;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,9 +57,28 @@ public class CalculateService {
     }
 
     @Transactional(readOnly = true)
-    public List<Conversion> getStatistics() {
-        List<Conversion> conversions = conversionRepository.findAll();
-        return conversions.stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
+    public Set<ConversionWithStatistics> getStatistics() {
+        List<Conversion> conversions = conversionRepository.findAll().stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
+        Set<String> key = conversions.stream().map(c -> c.getFirstCurrency() + c.getSecondCurrency()).collect(Collectors.toSet());
+        Set<ConversionWithStatistics> convStat = new HashSet<>();
+        for (Conversion c : conversions) {
+            List<Conversion> conv = conversions.stream().filter(cv ->
+                    key.contains(cv.getFirstCurrency() + cv.getSecondCurrency())).toList();
+            double summa = 0;
+            double sumRage = 0;
+            for (Conversion cv : conv) {
+                summa += cv.getSecondValue();
+                sumRage += cv.getSecondRate();
+            }
+            int count = conv.size();
+            ConversionWithStatistics conversionWithStatistics = new ConversionWithStatistics()
+                    .setFirstCurrency(c.getFirstCurrency())
+                    .setSecondCurrency(c.getSecondCurrency())
+                    .setAvgRage(sumRage / count)
+                    .setVolume((long) summa);
+            convStat.add(conversionWithStatistics);
+        }
+        return convStat;
     }
 
     @Transactional(readOnly = true)
