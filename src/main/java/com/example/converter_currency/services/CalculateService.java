@@ -55,7 +55,7 @@ public class CalculateService {
 
     @Transactional(readOnly = true)
     public List<Conversion> getStatistics() {
-        List<Conversion> conversions = conversionRepository.findByFirstCurrencyAndSecondCurrencyAndDate(firstCurrency, secondCurrency, date);
+        List<Conversion> conversions = conversionRepository.findAll();
         return conversions.stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
     }
 

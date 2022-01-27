@@ -3,6 +3,7 @@ scalar Date
 type Query {
 conversion: [Conversion]
 currency: [Currency]
+statistics: [Conversion]
 }
 
 type Conversion {
