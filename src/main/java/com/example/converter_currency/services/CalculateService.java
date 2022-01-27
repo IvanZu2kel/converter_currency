@@ -106,4 +106,8 @@ public class CalculateService {
         }
         return cr;
     }
+
+    public List<CurrencyRate> getAllCurrencyRates() {
+        return currencyRateRepository.findAll();
+    }
 }

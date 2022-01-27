@@ -1,4 +1,4 @@
-package com.example.converter_currency.controller;
+package com.example.converter_currency.controllers;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import com.example.converter_currency.services.CalculateService;
