@@ -1,6 +1,7 @@
 package com.example.converter_currency.services;
 
 import com.example.converter_currency.api.response.ConversionWithStatistics;
+import com.example.converter_currency.exception.NotFoundException;
 import com.example.converter_currency.models.Conversion;
 import com.example.converter_currency.models.Currency;
 import com.example.converter_currency.models.CurrencyRate;
@@ -28,8 +29,15 @@ public class CalculateService {
 
     private static final String RUB = "RUB";
 
+    /**
+     * Операция с конвертацией кол-ва одной валюты - в другую
+     * @param firstCurrency
+     * @param secondCurrency
+     * @param amount
+     * @return
+     */
     @Transactional
-    public double calculateValue(String firstCurrency, String secondCurrency, double amount) {
+    public double calculateValue(String firstCurrency, String secondCurrency, double amount) throws NotFoundException {
         LocalDate localDate = LocalDate.now();
         Optional<CurrencyRate> cr1 = getCurrencyRate(localDate, firstCurrency);
         Optional<CurrencyRate> cr2 = getCurrencyRate(localDate, secondCurrency);
@@ -38,28 +46,32 @@ public class CalculateService {
             cr1 = getCurrencyRate(localDate, firstCurrency);
             cr2 = getCurrencyRate(localDate, secondCurrency);
         }
-        Currency c1 = currencyRepository.findByCharCode(firstCurrency).orElseThrow();
-        Currency c2 = currencyRepository.findByCharCode(secondCurrency).orElseThrow();
-        int nominalC1 = c1.getNominal();
-        int nominalC2 = c2.getNominal();
-
-        Double rateCr1 = cr1.get().getRate();
-        Double rateCr2 = cr2.get().getRate();
-        double value = amount * (rateCr1 / nominalC1) / (rateCr2 * nominalC2) * 100.0 / 100.0;
-        double scale = Math.pow(10,2);
-        double result =  Math.ceil(value * scale) / scale;
-        Conversion conversion = new Conversion()
-                .setDate(localDate)
-                .setFirstValue(amount)
-                .setFirstCurrency(c1.getCharCode())
-                .setSecondValue(result)
-                .setSecondCurrency(c2.getCharCode())
-                .setFirstRate(rateCr1)
-                .setSecondRate(rateCr2);
-        conversionRepository.save(conversion);
-        return result;
+        Optional<Currency> c1 = currencyRepository.findByCharCode(firstCurrency);
+        Optional<Currency> c2 = currencyRepository.findByCharCode(secondCurrency);
+        if (cr2.isPresent() && cr1.isPresent() && c1.isPresent() && c2.isPresent()) {
+            Double rateCr1 = cr1.get().getRate();
+            Double rateCr2 = cr2.get().getRate();
+            double value = amount * (rateCr1 / c1.get().getNominal()) / (rateCr2 * c2.get().getNominal()) * 100.0 / 100.0;
+            double scale = Math.pow(10, 2);
+            double result = Math.ceil(value * scale) / scale;
+            Conversion conversion = new Conversion()
+                    .setDate(localDate)
+                    .setFirstValue(amount)
+                    .setFirstCurrency(c1.get().getCharCode())
+                    .setSecondValue(result)
+                    .setSecondCurrency(c2.get().getCharCode())
+                    .setFirstRate(rateCr1)
+                    .setSecondRate(rateCr2);
+            conversionRepository.save(conversion);
+            return result;
+        }
+        throw new NotFoundException();
     }
 
+    /**
+     * Получение статистики конвертаций
+     * @return
+     */
     @Transactional(readOnly = true)
     public Set<ConversionWithStatistics> getStatistics() {
         List<Conversion> conversions = conversionRepository.findAll().stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
@@ -85,12 +97,19 @@ public class CalculateService {
         return convStat;
     }
 
+    /**
+     * Получение спика всех конвертаций
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<Conversion> getConversions() {
-        List<Conversion> conversions = conversionRepository.findAll();
-        return conversions.stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
+        return conversionRepository.findAll();
     }
 
+    /**
+     * Получение списка всех валют
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<Currency> getAllCurrencies() {
         return currencyRepository.findAll();

@@ -29,6 +29,12 @@ import java.util.*;
 public class InitCurrencyService {
     private final static String CBR_URL = "http://www.cbr.ru/scripts/XML_daily.asp";
 
+    /**
+     * Инициализация на текущий день курсов валют
+     * @param currencyRateRepository
+     * @param currencyRepository
+     * @return
+     */
     @Bean
     ApplicationRunner init(CurrencyRateRepository currencyRateRepository, CurrencyRepository currencyRepository) {
         Optional<CurrencyRate> currencyRate = currencyRateRepository.findByDate(LocalDate.now());
@@ -48,7 +54,6 @@ public class InitCurrencyService {
     private DataFromXml parseRates() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         String format = sdf.format(new Date());
-        System.out.println(CBR_URL + "?date_req=" + format);
         try {
             Document doc = DocumentBuilderFactory
                     .newInstance()
