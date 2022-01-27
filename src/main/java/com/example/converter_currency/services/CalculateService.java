@@ -8,17 +8,15 @@ import com.example.converter_currency.models.CurrencyRate;
 import com.example.converter_currency.repositories.ConversionRepository;
 import com.example.converter_currency.repositories.CurrencyRateRepository;
 import com.example.converter_currency.repositories.CurrencyRepository;
-import com.google.common.util.concurrent.AtomicDouble;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +29,7 @@ public class CalculateService {
 
     /**
      * Операция с конвертацией кол-ва одной валюты - в другую
+     *
      * @param firstCurrency
      * @param secondCurrency
      * @param amount
@@ -70,6 +69,7 @@ public class CalculateService {
 
     /**
      * Получение статистики конвертаций
+     *
      * @return
      */
     @Transactional(readOnly = true)
@@ -99,6 +99,7 @@ public class CalculateService {
 
     /**
      * Получение спика всех конвертаций
+     *
      * @return
      */
     @Transactional(readOnly = true)
@@ -108,6 +109,7 @@ public class CalculateService {
 
     /**
      * Получение списка всех валют
+     *
      * @return
      */
     @Transactional(readOnly = true)

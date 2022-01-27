@@ -31,6 +31,7 @@ public class InitCurrencyService {
 
     /**
      * Инициализация на текущий день курсов валют
+     *
      * @param currencyRateRepository
      * @param currencyRepository
      * @return
