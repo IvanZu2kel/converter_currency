@@ -1,31 +1,28 @@
 package com.example.converter_currency.controller;
 
+import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.example.converter_currency.models.Conversion;
 import com.example.converter_currency.models.Currency;
 import com.example.converter_currency.repositories.ConversionRepository;
-import com.example.converter_currency.repositories.CurrencyRateRepository;
-import com.example.converter_currency.repositories.CurrencyRepository;
-import io.leangen.graphql.annotations.GraphQLArgument;
-import io.leangen.graphql.annotations.GraphQLQuery;
+import com.example.converter_currency.services.CalculateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
-public class ConversionGraph {
+public class ConversionGraph implements GraphQLQueryResolver {
     private final ConversionRepository conversionRepository;
-    private final CurrencyRepository currencyRepository;
-    private final CurrencyRateRepository currencyRateRepository;
+    private final CalculateService calculateService;
 //    private final RestTemplate http;
 
-    @GraphQLQuery(name = "conversion")
-    public Conversion conversion(@GraphQLArgument(name = "id") Long id) {
-        return conversionRepository.getById(id);
+    public List<Conversion> conversion() {
+        return this.calculateService.getConversions();
     }
 
-    @GraphQLQuery(name = "currency")
-    public Currency currency(@GraphQLArgument(name = "id") String id) {
-        return currencyRepository.getById(id);
+    public List<Currency> currency() {
+        return this.calculateService.getAllCurrencies();
     }
 }
 

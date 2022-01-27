@@ -1,0 +1,34 @@
+scalar Date
+
+type Query {
+conversion: [Conversion]
+currency: [Currency]
+}
+
+type Conversion {
+id: ID!
+firstCurrency: String,
+secondCurrency: String,
+firstValue: Short,
+secondValue: Short,
+firstRate: Float,
+secondRate: Float
+}
+
+type Currency {
+id: ID!
+numCode: String,
+charCode: String,
+nominal: Int,
+name: String
+}
+
+type CurrencyRate {
+id: ID!
+charCode: String,
+rate: Float
+}
+
+type Mutation {
+calculateValue(firstCurrency: String!, secondCurrency: String!, amount: Short!): Short!
+}

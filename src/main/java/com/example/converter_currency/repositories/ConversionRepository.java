@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ConversionRepository extends JpaRepository<Conversion, Long> {
-    List<Conversion> findByFirstCurrencyAndSecondCurrencyAndDate(String firstCurrency, String secondCurrency, LocalDate date);
+
 }

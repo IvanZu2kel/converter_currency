@@ -17,14 +17,18 @@ public class Conversion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
-    @Column
+    @Column(name = "first_currency")
     private String firstCurrency;
-    @Column
+    @Column(name = "second_currency")
     private String secondCurrency;
-    @Column
+    @Column(name = "first_value")
     private Double firstValue;
-    @Column
+    @Column(name = "second_value")
     private Double secondValue;
+    @Column(name = "first_rate")
+    private Double firstRate;
+    @Column(name = "second_rate")
+    private Double secondRate;
     @Column
     private LocalDate date;
 }

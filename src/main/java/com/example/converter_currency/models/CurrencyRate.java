@@ -25,7 +25,7 @@ public class CurrencyRate {
     private String id;
     @Column
     private LocalDate date;
-    @Column
+    @Column(name = "char_code")
     private String charCode;
     @Column
     private Double rate;

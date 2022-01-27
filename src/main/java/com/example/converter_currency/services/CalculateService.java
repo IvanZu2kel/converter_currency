@@ -8,6 +8,7 @@ import com.example.converter_currency.repositories.CurrencyRateRepository;
 import com.example.converter_currency.repositories.CurrencyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,6 +23,7 @@ public class CalculateService {
 
     private static final String RUB = "RUB";
 
+    @Transactional
     public double calculateValue(String firstCurrency, String secondCurrency, double amount) {
         LocalDate localDate = LocalDate.now();
         Optional<CurrencyRate> cr1 = getCurrencyRate(localDate, firstCurrency);
@@ -36,34 +38,46 @@ public class CalculateService {
         int nominalC1 = c1.getNominal();
         int nominalC2 = c2.getNominal();
 
-        double result = Math.round(amount * cr1.get().getRate() / nominalC1 / cr2.get().getRate() * nominalC2);
+        Double rateCr1 = cr1.get().getRate();
+        Double rateCr2 = cr2.get().getRate();
+        double result = Math.round(amount * (rateCr1 / nominalC1) / (rateCr2 * nominalC2) * 100.0 / 100.0);
         Conversion conversion = new Conversion()
                 .setDate(localDate)
                 .setFirstValue(amount)
                 .setFirstCurrency(c1.getCharCode())
                 .setSecondValue(result)
-                .setSecondCurrency(c2.getCharCode());
+                .setSecondCurrency(c2.getCharCode())
+                .setFirstRate(rateCr1)
+                .setSecondRate(rateCr2);
         conversionRepository.save(conversion);
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Conversion> getStatistics() {
+        List<Conversion> conversions = conversionRepository.findByFirstCurrencyAndSecondCurrencyAndDate(firstCurrency, secondCurrency, date);
+        return conversions.stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Conversion> getConversions() {
+        List<Conversion> conversions = conversionRepository.findAll();
+        return conversions.stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Currency> getAllCurrencies() {
+        return currencyRepository.findAll();
     }
 
     private Optional<CurrencyRate> getCurrencyRate(LocalDate localDate, String currency) {
         Optional<CurrencyRate> currencyRate = currencyRateRepository.findByDateAndCharCode(localDate, currency);
         Optional<CurrencyRate> cr;
         if (!currency.equals(RUB)) {
-            cr = currencyRate;
+            cr = currencyRate.stream().filter(c -> c.getDate().equals(LocalDate.now())).findFirst();
         } else {
             cr = currencyRateRepository.findByCharCode(RUB);
         }
         return cr;
-    }
-
-    public List<Conversion> getConversions(String firstCurrency, String secondCurrency, LocalDate date) {
-        List<Conversion> conversions = conversionRepository.findByFirstCurrencyAndSecondCurrencyAndDate(firstCurrency, secondCurrency, date);
-        return conversions.stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
-    }
-
-    public List<Currency> getAllCurrencies() {
-        return currencyRepository.findAll();
     }
 }

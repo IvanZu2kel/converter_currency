@@ -22,9 +22,9 @@ public class Currency {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Column
     private String id;
-    @Column
+    @Column(name = "num_code")
     private String numCode;
-    @Column
+    @Column(name = "char_code")
     private String charCode;
     @Column
     private int nominal;

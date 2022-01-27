@@ -33,15 +33,18 @@ public class InitCurrencyService {
 
     @Bean
     ApplicationRunner init(CurrencyRateRepository currencyRateRepository, CurrencyRepository currencyRepository) {
-        DataFromXml dataFromXml = parseRates();
-        DataFromXml data = Optional.of(Objects.requireNonNull(dataFromXml)).orElseThrow();
-        return init -> {
-            currencyRepository.deleteAll();
-            currencyRepository.save(new Currency("1", "111", "RUB", 1, "Российский рубль"));
-            currencyRepository.saveAll(data.getCurrencies());
-            currencyRateRepository.save(new CurrencyRate("1", null, "RUB", 1.0));
-            currencyRateRepository.saveAll(data.getCurrencyRates());
-        };
+        Optional<CurrencyRate> currencyRate = currencyRateRepository.findByDate(LocalDate.now());
+        if (currencyRate.isEmpty()) {
+            DataFromXml dataFromXml = parseRates();
+            DataFromXml data = Optional.of(Objects.requireNonNull(dataFromXml)).orElseThrow();
+            return init -> {
+                currencyRepository.deleteAll();
+                currencyRepository.save(new Currency("1", "111", "RUB", 1, "Российский рубль"));
+                currencyRepository.saveAll(data.getCurrencies());
+                currencyRateRepository.save(new CurrencyRate("1", null, "RUB", 1.0));
+                currencyRateRepository.saveAll(data.getCurrencyRates());
+            };
+        } else return null;
     }
 
     private DataFromXml parseRates() {
