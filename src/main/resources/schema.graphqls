@@ -6,21 +6,26 @@ currency: [Currency]
 statistics: [ConversionWithStatistics]
 }
 
+type Mutation {
+calculateValue(firstCurrency: String!, secondCurrency: String!, amount: Int!): Float!
+}
+
 type Conversion {
 id: ID!
 firstCurrency: String,
 secondCurrency: String,
-firstValue: Int,
-secondValue: Int,
+firstValue: Long,
+secondValue: Long,
 firstRate: Float,
-secondRate: Float
+secondRate: Float,
+date: Date
 }
 
 type ConversionWithStatistics {
 firstCurrency: String,
 secondCurrency: String,
 avgRage: Float,
-volume: Int
+volume: Long
 }
 
 type Currency {
@@ -34,9 +39,6 @@ name: String
 type CurrencyRate {
 id: ID!
 charCode: String,
-rate: Float
-}
-
-type Mutation {
-calculateValue(firstCurrency: String!, secondCurrency: String!, amount: Int!): Int!
+rate: Float,
+date: Date
 }

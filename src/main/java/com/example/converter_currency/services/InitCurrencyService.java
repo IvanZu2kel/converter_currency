@@ -20,12 +20,10 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class InitCurrencyService {
@@ -48,11 +46,14 @@ public class InitCurrencyService {
     }
 
     private DataFromXml parseRates() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        String format = sdf.format(new Date());
+        System.out.println(CBR_URL + "?date_req=" + format);
         try {
             Document doc = DocumentBuilderFactory
                     .newInstance()
                     .newDocumentBuilder()
-                    .parse(CBR_URL);
+                    .parse(CBR_URL + "?date_req=" + format);
             doc.getDocumentElement().normalize();
             NodeList allNodes = doc.getElementsByTagName("ValCurs");
             Node node = allNodes.item(0);

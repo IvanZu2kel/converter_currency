@@ -43,7 +43,9 @@ public class CalculateService {
 
         Double rateCr1 = cr1.get().getRate();
         Double rateCr2 = cr2.get().getRate();
-        double result = Math.round(amount * (rateCr1 / nominalC1) / (rateCr2 * nominalC2) * 100.0 / 100.0);
+        double value = amount * (rateCr1 / nominalC1) / (rateCr2 * nominalC2) * 100.0 / 100.0;
+        double scale = Math.pow(10,2);
+        double result =  Math.ceil(value * scale) / scale;
         Conversion conversion = new Conversion()
                 .setDate(localDate)
                 .setFirstValue(amount)
