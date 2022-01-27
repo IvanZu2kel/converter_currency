@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
 public class CalculateService {
@@ -61,11 +63,11 @@ public class CalculateService {
     @Transactional(readOnly = true)
     public Set<ConversionWithStatistics> getStatistics() {
         List<Conversion> conversions = conversionRepository.findAll().stream().filter(c -> c.getDate().isAfter(LocalDate.now().minusDays(7))).toList();
-        Set<String> key = conversions.stream().map(c -> c.getFirstCurrency() + c.getSecondCurrency()).collect(Collectors.toSet());
         Set<ConversionWithStatistics> convStat = new HashSet<>();
         for (Conversion c : conversions) {
+            String key = c.getFirstCurrency() + c.getSecondCurrency();
             List<Conversion> conv = conversions.stream().filter(cv ->
-                    key.contains(cv.getFirstCurrency() + cv.getSecondCurrency())).toList();
+                    key.equals(cv.getFirstCurrency() + cv.getSecondCurrency())).toList();
             double summa = 0;
             double sumRage = 0;
             for (Conversion cv : conv) {
@@ -76,7 +78,7 @@ public class CalculateService {
             ConversionWithStatistics conversionWithStatistics = new ConversionWithStatistics()
                     .setFirstCurrency(c.getFirstCurrency())
                     .setSecondCurrency(c.getSecondCurrency())
-                    .setAvgRage(sumRage / count)
+                    .setAvgRage((long) sumRage / count)
                     .setVolume((long) summa);
             convStat.add(conversionWithStatistics);
         }

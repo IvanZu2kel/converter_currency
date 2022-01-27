@@ -24,7 +24,7 @@ date: Date
 type ConversionWithStatistics {
 firstCurrency: String,
 secondCurrency: String,
-avgRage: Float,
+avgRage: Long,
 volume: Long
 }
 

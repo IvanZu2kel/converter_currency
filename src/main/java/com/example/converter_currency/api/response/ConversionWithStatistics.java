@@ -12,7 +12,7 @@ public class ConversionWithStatistics {
     @JsonProperty(value = "second_currency")
     private String secondCurrency;
     @JsonProperty(value = "avg_rage")
-    private Double avgRage;
+    private long avgRage;
     @JsonProperty(value = "volume")
     private long volume;
 }
