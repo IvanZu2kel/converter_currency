@@ -1,9 +1,9 @@
 server:
-  port: 8080
-  url: http://localhost:8080
+  port: ${PORT:8080}
+  url: https://currency-graphql.herokuapp.com
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/converter?currentSchema=converter
+    url: jdbc:${CLEARDB_DATABASE_URL:postgresql://localhost:5432/converter}
     username: postgres
     password: root
   jpa:
@@ -11,4 +11,3 @@ spring:
     hibernate:
       ddl-auto: none
       dialect: org.hibernate.dialect.PostgreSQLDialect
-
