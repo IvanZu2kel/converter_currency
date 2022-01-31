@@ -13,10 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +35,14 @@ public class CalculateService {
      */
     @Transactional
     public double calculateValue(String firstCurrency, String secondCurrency, double amount) throws NotFoundException {
-        LocalDate localDate = LocalDate.now();
+        Calendar c = Calendar.getInstance();
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        LocalDate localDate;
+        if (dayOfWeek == 1) {
+            localDate = LocalDate.now().minusDays(1);
+        } else {
+            localDate = LocalDate.now();
+        }
         Optional<CurrencyRate> cr1 = getCurrencyRate(localDate, firstCurrency);
         Optional<CurrencyRate> cr2 = getCurrencyRate(localDate, secondCurrency);
         if (cr1.isEmpty() || cr2.isEmpty()) {
